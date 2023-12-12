@@ -179,4 +179,86 @@ class ViewController: UIViewController {
 }
 ```
 
+## Project 4
+Combine is similar to RxSwift but we don't have to install POD for that because Combine framework provides a declarative Swift API.
+If we have to call **DOTA HERO** API without using any POD we can do like this:
 
+```swift
+// VIEW MODEL
+
+import Foundation
+import Combine
+
+enum HTTPError: LocalizedError {
+    case statusCode
+}
+
+class ViewModel {
+    
+    var observers: Set<AnyCancellable> = []
+    var dotaHeroDataObserver = PassthroughSubject<HERO, Error>()
+    let url = URL(string: "https://api.opendota.com/api/heroStats")!
+    
+    func getDataSet() {
+        dotaHeroDataObserver.send([.default])
+      
+        URLSession.shared.dataTaskPublisher(for: url)
+        .tryMap { output in
+            guard let response = output.response as? HTTPURLResponse, response.statusCode == 200 else {
+                throw HTTPError.statusCode
+            }
+            return output.data
+        }
+        .decode(type: HERO.self, decoder: JSONDecoder())
+        .eraseToAnyPublisher()
+        .sink(receiveCompletion: { completion in
+            switch completion {
+            case .finished:
+                self.dotaHeroDataObserver.send(completion: .finished)
+            case .failure(let error):
+                self.dotaHeroDataObserver.send(completion: .failure(error))
+            }
+        }, receiveValue: { heros in
+            self.dotaHeroDataObserver.send(heros)
+        }).store(in: &observers)
+        
+
+    }
+}
+```
+
+```swift
+// VIEW CONTROLLER
+
+import UIKit
+import Combine
+
+class ViewController: UIViewController {
+    let viewModel = ViewModel()
+    var observers: Set<AnyCancellable> = []
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        configDependency()
+        viewModel.getDataSet()
+    }
+    
+    private func configDependency() {
+        viewModel.dotaHeroDataObserver
+            .sink(receiveCompletion: {completetion in
+                switch completetion {
+//                  It is called at last when data is recieved.
+                case .finished:
+//                  called when successfully recieved data
+                    print("FINISHED")
+                case .failure(let error):
+//                    called when recieving error from api calling.
+                    print("ERROR: \(error)")
+                }
+            }, receiveValue: {data in
+                print(data)
+            }).store(in: &observers)
+    }
+}
+```
