@@ -17,8 +17,9 @@ We have used **Future** publisher for fetching APi Data from.
 **Future** - A publisher that eventually produces a single value and then finishes or fails.
 
 **Network Manager**
-Taking dummy data for api calling.
+
 ```swift
+//  Taking dummy data for api calling.
     var data: [String] = ["Alpha", "Beta", "Gama"]
     
     func fetchData() -> Future<[String], Error> {
