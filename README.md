@@ -67,3 +67,8 @@ sendMessage.sink { string in
             print(string)
         }.store(in: &observers)
 ```
+
+**Extras:** we can define sigle observable using
+```swift
+var mainTableViewObserver: AnyCancellable?
+```
