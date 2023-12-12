@@ -29,3 +29,41 @@ We have used **Future** publisher for fetching APi Data from.
         }
     }
 ```
+
+Handling data from network manager class by using sink.
+
+```swift
+var observers : [AnyCancellable] = []
+
+NetworkManager.shared.fetchData()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+            switch completion {    
+            case.finished:
+                print("Finished")
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }, receiveValue: { value in
+            self.alpha = value
+            self.mainTableView.reloadData()
+        }).store(in: &observers)
+```
+
+Now, let see **PassthroughSubject**, a subject that broadcasts elements to downstream subscribers.
+```swift
+final class PassthroughSubject<Output, Failure> where Failure : Error
+```
+
+if we want to send any string, we can create like this
+```swift
+let sendMessage = PassthroughSubject<String, Never>()let sendMessage = PassthroughSubject<String, Never>()
+sendMessage.send("Buttton Was pressed")
+```
+and for receiving data ->
+```swift
+var observers : [AnyCancellable] = []
+sendMessage.sink { string in
+            print(string)
+        }.store(in: &observers)
+```
