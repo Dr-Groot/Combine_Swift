@@ -10,7 +10,7 @@ You can combine the output of multiple publishers and coordinate their interacti
 By adopting Combine, you’ll make your code easier to read and maintain, by centralizing your event-processing code and eliminating troublesome techniques like nested closures and convention-based callbacks.
 
 
-## Project 1 - CombineIntro
+## Project 1
 
 We have used **Future** publisher for fetching APi Data from.
 
@@ -71,4 +71,33 @@ sendMessage.sink { string in
 **Extras:** we can define sigle observable using
 ```swift
 var mainTableViewObserver: AnyCancellable?
+```
+
+## Project 2
+
+Basic counter
+
+```swift
+class Counter {
+    static var value = 0
+    
+    var counterPublisher = PassthroughSubject<Int, Never>()
+
+    func increment() {
+        Counter.value += 1
+        counterPublisher.send(Counter.value)
+    }
+}
+```
+
+```swift
+let counter = Counter()
+var observers: [AnyCancellable] = []
+
+counter.increment()
+
+counter.counterPublisher
+            .sink {value in
+                print(value)
+            }.store(in: &observers)
 ```
