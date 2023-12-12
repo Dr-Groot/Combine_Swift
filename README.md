@@ -101,3 +101,82 @@ counter.counterPublisher
                 print(value)
             }.store(in: &observers)
 ```
+
+## Project 3
+
+**DOTA HERO** API calling using combine.
+
+```swift
+// VIEW MODEL
+
+import Foundation
+import Moya
+import Combine
+
+class ViewModel {
+    
+    var observers: Set<AnyCancellable> = []
+    let dotaServiceProvider = MoyaProvider<DotaService>()
+    var dotaHeroDataObserver = PassthroughSubject<HERO, Error>()
+    
+    
+    func getDataSet() {
+//        Set default data
+        dotaHeroDataObserver.send([.default])
+        
+//        Fetching data
+       dotaServiceProvider.requestPublisher(.heroStats)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("Fininshed data loading")
+                case .failure(let error):
+                    self.dotaHeroDataObserver.send(completion: .failure(error))
+                }
+            }, receiveValue: {response in
+                let responseData = try! JSONDecoder().decode(HERO.self, from: response.data)
+                self.dotaHeroDataObserver.send(responseData)
+                self.dotaHeroDataObserver.send(completion: .finished)
+            }).store(in: &observers)
+    }
+}
+```
+
+```swift
+// VIEW CONTROLLER
+
+import UIKit
+import Combine
+
+class ViewController: UIViewController {
+    
+    let viewModel = ViewModel()
+    var observers: Set<AnyCancellable> = []
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        configDependency()
+        viewModel.getDataSet()
+    }
+    
+    private func configDependency() {
+        viewModel.dotaHeroDataObserver
+            .sink(receiveCompletion: {completetion in
+                switch completetion {
+//                  It is called at last when data is recieved.
+                case .finished:
+//                  called when successfully recieved data
+                    print("FINISHED")
+                case .failure(let error):
+//                    called when recieving error from api calling.
+                    print("ERROR: \(error)")
+                }
+            }, receiveValue: {data in
+                print(data)
+            }).store(in: &observers)
+    }
+}
+```
+
+
