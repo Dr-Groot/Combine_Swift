@@ -24,6 +24,7 @@ We have used **Future** publisher for fetching APi Data from.
     
     func fetchData() -> Future<[String], Error> {
         return Future { promixe in
+//      API call 
             promixe(.success(self.data))
         }
     }
