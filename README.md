@@ -252,9 +252,9 @@ networkManager.fetchData()
 Revise basic API Call example
 
 ```swift
-guard let url = URL(string: "https://api.openweathermap.org/data/2.5/weather?q=delhi&appid={YOUR-API-KEY}&units=metric") else {
-            return
-        }
+guard let url = URL(string:
+  "https://api.openweathermap.org/data/2.5/weather?q=delhi&appid={YOUR-API-KEY}&units=metric")
+else { return }
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -334,7 +334,11 @@ import Combine
 class ViewModel {
     
     var observers: Set<AnyCancellable> = []
-    let dotaServiceProvider = MoyaProvider<DotaService>(plugins: [ NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))])
+    let dotaServiceProvider = MoyaProvider<DotaService>(
+          plugins: [ NetworkLoggerPlugin(
+              configuration: .init(logOptions: .verbose))
+                    ]
+    )
     var dotaHeroDataObserver = PassthroughSubject<HERO, Error>()
     
     func getDataSet() {
@@ -353,7 +357,8 @@ class ViewModel {
                 }
             }, receiveValue: {response in
                 do {
-                    let responseData = try JSONDecoder().decode(HERO.self, from: response.data)
+                    let responseData = try JSONDecoder().decode(
+                                      HERO.self, from: response.data)
                     self.dotaHeroDataObserver.send(responseData)
                     self.dotaHeroDataObserver.send(completion: .finished)
                 } catch (let error) {
@@ -452,7 +457,8 @@ class ViewModel {
 
         URLSession.shared.dataTaskPublisher(for: url)
         .tryMap { output in
-            guard let response = output.response as? HTTPURLResponse, response.statusCode == 200 else {
+            guard let response = output.response as? HTTPURLResponse,
+                                  response.statusCode == 200 else {
                 throw HTTPError.statusCode
             }
             return output.data
