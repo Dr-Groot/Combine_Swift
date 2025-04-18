@@ -1,13 +1,30 @@
 # Combine
 
-The Combine framework provides a declarative Swift API for processing values over time. These values can represent many kinds of asynchronous events. Combine declares publishers to expose values that can change over time, and subscribers to receive those values from the publishers.
+The Combine framework provides a declarative Swift API for processing values over time. These values can represent many kinds of asynchronous events. This means that we can use the framework’s APIs to handle *closures, delegates, KVO, and notifications* more efficiently, and transform, filter, and combine data streams in powerful ways. Combine declares publishers to expose values that can change over time, and subscribers to receive those values from the publishers.
 
-+ The **Publisher** protocol declares a type that can deliver a sequence of values over time. Publishers have operators to act on the values received from upstream publishers and republish them.
-+ At the end of a chain of publishers, a **Subscriber** acts on elements as it receives them. Publishers only emit values when explicitly requested to do so by subscribers. This puts your subscriber code in control of how fast it receives events from the publishers it’s connected to.
+For example, if we need to handle a chain of events, such as waiting for a network request to complete before updating the UI, we can use the Combine framework to write more concise and readable code. We can create a publisher that emits a value when the network request completes, and subscribe to that publisher to update the UI. This can make our code more streamlined and easier to reason about.
 
-You can combine the output of multiple publishers and coordinate their interaction. For example, you can subscribe to updates from a text field’s publisher, and use the text to perform URL requests. You can then use another publisher to process the responses and use them to update your app.
+In the rest of this tutorial, we’ll explore the basics of the Combine framework and show you how to use it to write API calls.
 
-By adopting Combine, you’ll make your code easier to read and maintain, by centralizing your event-processing code and eliminating troublesome techniques like nested closures and convention-based callbacks.
+**How Does Combine Work?**
+
+Combine framework works on the basis of following three key concepts
+
+1. Publisher
+
+2. Subscriber
+
+3. Operator
+
+Combine is mainly working as publisher and subscriber model.
+
+The **Publisher** is a protocol that defines a value type with two associated types: **Output** and **Failure**. Publishers allow the registration of subscribers and emit values to those subscribers. Publishers can be thought of as the source of the data stream.
+
+The **Subscriber** is also a protocol, but it is a reference type. Subscribers can receive values from publishers and can be notified when the publisher has finished emitting values. The subscriber has two associated types: **Input** and **Failure**. Subscribers can be thought of as the destination of the data stream.
+
+Here is the pattern for the Combine publisher and subscriber model.
+
+![](https://miro.medium.com/v2/resize:fit:700/1*ZwMj-2ofoo1MU3Xfw8j2Eg.png)
 
 
 ## Project 1
